@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo da Cobrinha</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(to bottom right, #3F51B5, #2196F3);
+      color: #fff;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    canvas {
+      border: 5px solid #fff;
+      border-radius: 10px;
+      background-color: #111;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+<h1>Jogo da Cobrinha</h1>
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const gridSize = 20;
+  const snakeSize = 20;
+
+  let snake = [
+    { x: 100, y: 100 },
+  ];
+
+  let food = { x: 0, y: 0 };
+
+  let direction = 'right';
+
+  function drawSnake() {
+    snake.forEach((segment, index) => {
+      ctx.fillStyle = index === 0 ? '#4CAF50' : '#2ecc71';
+      ctx.fillRect(segment.x, segment.y, snakeSize, snakeSize);
+      ctx.strokeStyle = '#333';
+      ctx.strokeRect(segment.x, segment.y, snakeSize, snakeSize);
+    });
+  }
+
+  function drawFood() {
+    ctx.fillStyle = '#FF5252';
+    ctx.fillRect(food.x, food.y, snakeSize, snakeSize);
+    ctx.strokeStyle = '#333';
+    ctx.strokeRect(food.x, food.y, snakeSize, snakeSize);
+  }
+
+  function draw() {
+    // Limpar o canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawSnake();
+    drawFood();
+  }
+
+  function update() {
+    const head = { ...snake[0] };
+
+    switch (direction) {
+      case 'up':
+        head.y -= gridSize;
+        break;
+      case 'down':
+        head.y += gridSize;
+        break;
+      case 'left':
+        head.x -= gridSize;
+        break;
+      case 'right':
+        head.x += gridSize;
+        break;
+    }
+
+    snake.unshift(head);
+
+    if (head.x === food.x && head.y === food.y) {
+      food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
+      food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+    } else {
+      snake.pop();
+    }
+
+    if (
+      head.x < 0 ||
+      head.y < 0 ||
+      head.x >= canvas.width ||
+      head.y >= canvas.height
+    ) {
+      alert('Fim de jogo!');
+      snake = [{ x: 100, y: 100 }];
+      direction = 'right';
+    }
+
+    for (let i = 1; i < snake.length; i++) {
+      if (head.x === snake[i].x && head.y === snake[i].y) {
+        alert('Fim de jogo!');
+        snake = [{ x: 100, y: 100 }];
+        direction = 'right';
+      }
+    }
+
+    draw();
+  }
+
+  function handleKeyPress(event) {
+    switch (event.key.toLowerCase()) {
+      case 'w':
+      case 'arrowup':
+        if (direction !== 'down') {
+          direction = 'up';
+        }
+        break;
+      case 's':
+      case 'arrowdown':
+        if (direction !== 'up') {
+          direction = 'down';
+        }
+        break;
+      case 'a':
+      case 'arrowleft':
+        if (direction !== 'right') {
+          direction = 'left';
+        }
+        break;
+      case 'd':
+      case 'arrowright':
+        if (direction !== 'left') {
+          direction = 'right';
+        }
+        break;
+    }
+  }
+
+  document.addEventListener('keydown', handleKeyPress);
+
+  food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
+  food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+
+  setInterval(update, 150);
+</script>
+</body>
+</html>
